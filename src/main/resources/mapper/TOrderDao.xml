@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elite.mybatisplus.dao.TOrderDao">
+
+    <resultMap type="com.elite.mybatisplus.entity.TOrder" id="TOrderMap">
+        <result property="transferOrderId" column="transfer_order_id" jdbcType="INTEGER"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TOrderMap">
+        select
+          transfer_order_id, price, status, version
+        from t_order
+        where transfer_order_id = #{transferOrderId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TOrderMap">
+        select
+          transfer_order_id, price, status, version
+        from t_order
+        <where>
+            <if test="transferOrderId != null">
+                and transfer_order_id = #{transferOrderId}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="version != null">
+                and version = #{version}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from t_order
+        <where>
+            <if test="transferOrderId != null">
+                and transfer_order_id = #{transferOrderId}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="version != null">
+                and version = #{version}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="transferOrderId" useGeneratedKeys="true">
+        insert into t_order(price, status, version)
+        values (#{price}, #{status}, #{version})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="transferOrderId" useGeneratedKeys="true">
+        insert into t_order(price, status, version)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.price}, #{entity.status}, #{entity.version})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="transferOrderId" useGeneratedKeys="true">
+        insert into t_order(price, status, version)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.price}, #{entity.status}, #{entity.version})
+        </foreach>
+        on duplicate key update
+        price = values(price),
+        status = values(status),
+        version = values(version)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update t_order
+        <set>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="version != null">
+                version = #{version},
+            </if>
+        </set>
+        where transfer_order_id = #{transferOrderId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from t_order where transfer_order_id = #{transferOrderId}
+    </delete>
+
+</mapper>
+
